@@ -1,0 +1,2 @@
+# tensorops
+Tensorops Application Strategy
