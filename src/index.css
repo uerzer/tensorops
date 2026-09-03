@@ -1,1 +1,268 @@
 @import "tailwindcss";
+
+/* ————— runtime palette: "Document" (light) / "Console" (dark) ————— */
+:root {
+  --paper: #f0f1ec;
+  --panel: #fafaf6;
+  --panel2: #e7e9e1;
+  --ink: #1a2430;
+  --ink2: #55616f;
+  --line: rgba(26, 36, 48, 0.16);
+  --line-soft: rgba(26, 36, 48, 0.08);
+  --accent: #e8590c;
+  --accent-ink: #fdf3ec;
+  --accent2: #0b7285;
+  --ok: #2f9e44;
+  --warn: #b88207;
+  --bad: #c92a2a;
+  --grid: rgba(26, 36, 48, 0.045);
+  --glow: rgba(232, 89, 12, 0.14);
+  color-scheme: light;
+}
+.dark {
+  --paper: #0d141d;
+  --panel: #131c27;
+  --panel2: #1a2634;
+  --ink: #e6ecf2;
+  --ink2: #8fa1b3;
+  --line: rgba(230, 236, 242, 0.16);
+  --line-soft: rgba(230, 236, 242, 0.07);
+  --accent: #ff7a29;
+  --accent-ink: #221206;
+  --accent2: #4cc3d9;
+  --ok: #51cf66;
+  --warn: #f0b429;
+  --bad: #ff6b6b;
+  --grid: rgba(230, 236, 242, 0.035);
+  --glow: rgba(255, 122, 41, 0.16);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-display: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-paper: var(--paper);
+  --color-panel: var(--panel);
+  --color-panel2: var(--panel2);
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-line: var(--line);
+  --color-linesoft: var(--line-soft);
+  --color-accent: var(--accent);
+  --color-accentink: var(--accent-ink);
+  --color-accent2: var(--accent2);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* layered ambient background: engineering grid + soft signal glow */
+.gridpaper {
+  background-image:
+    radial-gradient(ellipse 90% 55% at 85% -5%, var(--glow), transparent 60%),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 100% 100%, 34px 34px, 34px 34px;
+}
+
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+* { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-thumb { background: var(--line); border-radius: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* ————— composite classes ————— */
+@layer components {
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink2);
+  }
+  .kicker-accent { color: var(--accent); }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .num-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0 5px;
+    background: var(--panel);
+  }
+  .cit {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    color: var(--accent);
+    vertical-align: super;
+    line-height: 0;
+    cursor: pointer;
+    padding: 0 1px;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+  }
+  .cit:hover { background: var(--accent); color: var(--accent-ink); }
+  .dotted-leader {
+    flex: 1;
+    border-bottom: 1px dotted var(--line);
+    margin: 0 8px 5px;
+    min-width: 12px;
+  }
+  .hairline { border-color: var(--line); }
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    background: var(--panel);
+    color: var(--ink);
+    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-solid {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn-solid:hover { color: var(--accent-ink); box-shadow: 0 4px 18px var(--glow); }
+  .stamp {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    border-radius: 3px;
+    padding: 3px 8px;
+    transform: rotate(-2deg);
+    display: inline-block;
+    opacity: 0.85;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--ink2);
+    white-space: nowrap;
+  }
+  .codeblock {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  .navlink {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border-left: 2px solid transparent;
+    color: var(--ink2);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    width: 100%;
+    text-align: left;
+  }
+  .navlink:hover { color: var(--ink); background: var(--panel2); }
+  .navlink-active {
+    color: var(--ink);
+    background: var(--panel);
+    border-left-color: var(--accent);
+    font-weight: 600;
+  }
+  .table-dense th {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink2);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  .table-dense td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13.5px;
+    vertical-align: top;
+  }
+  .table-dense tr:last-child td { border-bottom: none; }
+  .table-dense tbody tr { transition: background 0.15s ease; }
+  .table-dense tbody tr:hover { background: var(--panel2); }
+}
+
+/* ————— motion ————— */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+@keyframes blinkc { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
+@keyframes pulsedot { 0%, 100% { box-shadow: 0 0 0 0 var(--glow); } 50% { box-shadow: 0 0 0 6px transparent; } }
+@keyframes tickerx { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
+@keyframes dashdraw { from { stroke-dashoffset: 340; } to { stroke-dashoffset: 0; } }
+@keyframes barfill { from { width: 0; } }
+
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.reveal.is-in { opacity: 1; transform: none; }
+
+.anim-rise { animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.anim-fade { animation: fadein 0.3s ease both; }
+.cursor-blink::after { content: "▌"; margin-left: 2px; animation: blinkc 1s steps(1) infinite; color: var(--accent); }
+.live-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--ok); animation: pulsedot 2s ease infinite; }
+.ticker-track { display: flex; gap: 0; width: max-content; animation: tickerx 46s linear infinite; }
+.ticker-track:hover { animation-play-state: paused; }
+.bar-anim { animation: barfill 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.dash-anim { stroke-dasharray: 340; animation: dashdraw 1.6s ease both; }
+.shimmer-line {
+  background: linear-gradient(90deg, var(--panel2) 25%, var(--line-soft) 50%, var(--panel2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .ticker-track, .shimmer-line, .dash-anim { animation: none; }
+}
