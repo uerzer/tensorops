@@ -35,13 +35,39 @@ def load(name):
 
 LB, lb_src = load("leaderboard.json")
 PR, pr_src = load("prices.json")
+
+def _norm_model(name):
+    n = name.lower().strip()
+    n = re.sub(r"-(high|max|low|thinking|chat|latest)$", "", n)
+    n = re.sub(r"^\w[\w-]*//", "", n)  # org prefixes like openai/
+    return n
+
+def _join_prices():
+    """Join price data onto leaderboard models (the site's core product: rank + $ in one table)."""
+    if not LB or not PR:
+        return
+    pmap = {}
+    for p in PR["models"]:
+        pmap.setdefault(_norm_model(p["model"]), p)
+    joined = 0
+    for m in LB["models"]:
+        p = pmap.get(_norm_model(m["model"]))
+        if p:
+            m["price"] = {"in": p["input_per_1m_usd"], "out": p["output_per_1m_usd"],
+                          "conf": p.get("confidence", "secondary")}
+            joined += 1
+        else:
+            m["price"] = None
+    print("price-join: {}/{} leaderboard models have verified prices".format(joined, len(LB["models"])))
+
+_join_prices()
 try:
     GPU, gpu_src = load("gpu.json")
 except Exception:
     GPU, gpu_src = None, None
 
 SITE_NAME = "AI Stack Intelligence"
-SITE_TAG = "Which AI model, stack, and tools for your use case — at what cost."
+SITE_TAG = "The price tag on every AI model, tracked. No hype, no affiliate theater — official prices, dated sources, real math."
 UPDATED = (PR or LB or {"updated": "2026-10-11"}).get("updated", "2026-10-11")
 
 # ---------------------------------------------------------------- helpers
@@ -201,65 +227,80 @@ def p_home():
     spread = cheapest_spread()
     stat_cells = ""
     if LB:
-        stat_cells += '<div class="stat"><b>{}</b><span>models ranked by live Elo</span></div>'.format(len(LB["models"]))
+        priced = sum(1 for m in LB["models"] if m.get("price"))
+        stat_cells += '<div class="stat"><b>{}</b><span>models ranked — {} with verified prices</span></div>'.format(len(LB["models"]), priced)
     if PR:
-        stat_cells += '<div class="stat"><b>{}</b><span>model price points, dated + sourced</span></div>'.format(len(PR["models"]))
+        stat_cells += '<div class="stat"><b>{}</b><span>price points, dated + sourced</span></div>'.format(len(PR["models"]))
     if GPU:
         stat_cells += '<div class="stat"><b>{}</b><span>GPU offers tracked $/hr</span></div>'.format(len(GPU.get("offers", [])))
-    stat_cells += '<div class="stat"><b>{}</b><span>official pricing pages verified</span></div>'.format(
-        sum(1 for m in (PR["models"] if PR else []) if m.get("confidence") == "official"))
     if spread:
         cheap, dear, ratio = spread
-        stat_cells += ('<div class="stat"><b>{r:.0f}×</b><span>spread between cheapest ({cm}) and priciest ({dm}) per 1M tokens</span></div>'
+        stat_cells += ('<div class="stat"><b>{r:.0f}×</b><span>cheapest ({cm}) vs priciest ({dm}) per 1M tokens</span></div>'
                        ).format(r=ratio, cm=e(cheap["model"]), dm=e(dear["model"]))
-    cards = """
-<div class="grid-3">
-  <div class="card"><div class="card-icon">▲</div><h3>Live leaderboard</h3>
-    <p>Every major model ranked by crowdsourced Elo — refreshed from open arena data, not vibes. Sort, filter by license, search.</p>
-    <a class="card-link" href="{lb}">Open the leaderboard →</a></div>
-  <div class="card"><div class="card-icon">$</div><h3>Price calculator</h3>
-    <p>Pick a workload. Compare monthly API cost across {nm} models with official, dated pricing. Share the exact scenario by URL.</p>
-    <a class="card-link" href="{calc}">Run your numbers →</a></div>
-  <div class="card"><div class="card-icon">⇄</div><h3>Honest comparisons</h3>
-    <p>ChatGPT vs Claude, Cursor vs Copilot, which model for your job — tables first, methodology in the open, no affiliate theater.</p>
-    <a class="card-link" href="{cmp}">Read comparisons →</a></div>
-</div>""".format(lb=u("leaderboard.html"), calc=u("calculator.html"), cmp=u("comparisons/index.html"),
-                nm=len(PR["models"]) if PR else "the major")
+    # the join IS the product: top models with their price, one table
+    if LB:
+        rows = []
+        for m in LB["models"][:10]:
+            p = m.get("price")
+            price = ("${:,.2f} / ${:,.2f}".format(p["in"], p["out"])) if p else '<span class="text-low">n/a</span>'
+            elo = "{:,.0f}".format(int(m["elo"]))
+            rows.append("<tr><td class='rank-cell'>{r}</td><td><span class='model-name'>{m}</span></td>"
+                        "<td><span class='org-tag'>{o}</span></td><td class='num'>{elo}</td><td class='num'>{price}</td></tr>".format(
+                            r=m["rank"], m=e(m["model"]), o=e(m["org"]), elo=elo, price=price))
+        lbprev = ('<div class="table-wrap"><table><thead><tr><th>#</th><th>Model</th><th>Org</th>'
+                  '<th class="num">Elo</th><th class="num">$/1M in·out</th></tr></thead><tbody>' + "".join(rows) +
+                  "</tbody></table></div>")
+    else:
+        lbprev = ""
     body = """
 <section class="hero"><div class="container">
   <div class="grid-bg" aria-hidden="true"></div>
-  <p class="eyebrow">Independent · data-backed · updated {up}</p>
-  <h1>Which AI model, at <span class="grad">what cost</span>, for your actual workload.</h1>
-  <p class="hero-sub">Live model rankings from crowdsourced arena battles. API cost math from official pricing pages — every figure dated and sourced. Built for engineers who choose stacks, not headlines.</p>
+  <p class="eyebrow">Independent · updated {up} · every price dated + sourced</p>
+  <h1>The best AI models, <span class="grad">priced</span>.</h1>
+  <p class="hero-sub">Rank from real blind battles. Price from official vendor pages. Joined in one table, dated, sourced. The number your vendor hopes you never look up.</p>
   <div class="hero-actions">
-    <a class="btn btn-primary btn-lg" href="{calc}">Compare API costs</a>
-    <a class="btn btn-ghost btn-lg" href="{lb}">See the leaderboard</a>
+    <a class="btn btn-primary btn-lg" href="{lb}">Full leaderboard</a>
+    <a class="btn btn-ghost btn-lg" href="{calc}">Cost your workload</a>
   </div>
-  <p class="hero-note">Data: LMArena open dataset (CC-BY-4.0) · official provider pricing pages · refreshed {up}</p>
+  <p class="hero-note">LMArena open dataset (CC-BY-4.0) + official pricing pages · refreshed {up}</p>
 </div></section>
 <section class="section-tight"><div class="container"><div class="stats">{stats}</div></div></section>
 <section class="section"><div class="container">
-  <div class="section-head"><h2>The numbers, live</h2><p class="lede">Top of the board right now — the full table is sortable and filterable.</p></div>
+  <div class="section-head"><h2>Top 10, with the price tag</h2><p class="lede">Crowd Elo next to what each actually costs per million tokens. The full table is sortable.</p></div>
   {lbprev}
-  <div class="cta-row"><a class="btn btn-ghost" href="{lb}">Full leaderboard →</a></div>
+  <div class="cta-row"><a class="btn btn-ghost" href="{lb}">All {n} models →</a></div>
 </div></section>
-<section class="section"><div class="container">{cards}</div></section>
+<section class="section"><div class="container"><div class="grid-3">{cards}</div></div></section>
 <section class="section newsletter"><div class="container" style="max-width:640px">
   <h2>The Stack Brief</h2>
   <p class="lede">Weekly, 5 minutes: model moves that matter, price changes, one tactic from real builds.</p>
   {nl}
 </div></section>""".format(
-        up=UPDATED, stats=stat_cells, lbprev=lb_preview_table(), cards=cards,
+        up=UPDATED, stats=stat_cells, lbprev=lbprev, cards=CARDS_HTML,
+        n=len(LB["models"]) if LB else 40,
         calc=u("calculator.html"), lb=u("leaderboard.html"), nl=nl_form())
-    ld = jsonld_dataset("AI model leaderboard", "Crowdsourced Elo rankings for frontier LLMs, refreshed from the LMArena open dataset.")
-    return page("index.html", SITE_NAME + " — model leaderboard & API price calculator", SITE_TAG, body, "", ld)
+    ld = jsonld_dataset("AI model leaderboard with prices", "Frontier LLMs ranked by crowdsourced Elo with verified per-1M-token API prices from official pages.")
+    return page("index.html", SITE_NAME + " — every AI model, ranked and priced", SITE_TAG, body, "", ld)
+
+CARDS_HTML = """
+<div class="card"><div class="card-icon">▲</div><h3>Live leaderboard</h3>
+  <p>40 models by crowd Elo — blind battles, not vendor benchmarks. Now with the price column attached.</p>
+  <a class="card-link" href="{lb}">Open the board →</a></div>
+<div class="card"><div class="card-icon">$</div><h3>Price calculator</h3>
+  <p>Your workload, {nm} models, official list prices. See the spread before you commit an architecture to it.</p>
+  <a class="card-link" href="{calc}">Run your numbers →</a></div>
+<div class="card"><div class="card-icon">⇄</div><h3>Comparisons with a verdict</h3>
+  <p>ChatGPT vs Claude, Cursor vs Copilot. Tables first, a straight answer second. No "it depends" cop-outs.</p>
+  <a class="card-link" href="{cmp}">Read comparisons →</a></div>
+""".format(lb=u("leaderboard.html"), calc=u("calculator.html"), cmp=u("comparisons/index.html"),
+           nm=len(PR["models"]) if PR else 56)
 
 def p_leaderboard():
     body = """
 <section class="hero" style="padding:56px 0 40px"><div class="container">
   <p class="eyebrow">Text arena · style-controlled · updated {up}</p>
   <h1>Model <span class="grad">leaderboard</span></h1>
-  <p class="hero-sub">{n} models ranked by crowdsourced Elo from blind side-by-side battles (LMArena, CC-BY-4.0). Click any column to sort; filter by org or license.</p>
+  <p class="hero-sub">Rank by real blind battles, price from official pages — joined in one table. {n} models, every figure dated. Click any column to sort.</p>
 </div></section>
 <section class="section-tight"><div class="container" data-lb-table>
   <div class="toolbar">
@@ -276,6 +317,7 @@ def p_leaderboard():
       <th class="sortable" data-key="model">Model <span class="arrow"></span></th>
       <th class="sortable" data-key="org">Org <span class="arrow"></span></th>
       <th class="sortable" data-key="elo">Elo <span class="arrow"></span></th>
+      <th class="sortable num" data-key="price">$/1M in·out <span class="arrow"></span></th>
       <th class="sortable num" data-key="votes">Votes <span class="arrow"></span></th>
       <th class="sortable" data-key="license">License <span class="arrow"></span></th>
     </tr></thead>

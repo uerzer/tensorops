@@ -1,0 +1,38 @@
+THE STACK BRIEF — Issue #001
+40 models ranked. 20 priced. Zero vendor PR.
+
+1. THE NUMBER
+Frontier intelligence is a commodity input now. The priced models span 1475-1507 Elo —
+a 32-point quality band — while their cost per million tokens spans
+$0.24-$20.00 blended (3:1 in:out). That's a
+84x price spread inside one quality band. Most teams are overpaying for rank they can't measure.
+
+2. THE BOARD (Elo | blended $/1M | Elo per dollar)
+  #38 glm-5.3-flash                1474.6  $  0.24  6208.8
+  #8  gemini-3.8-flash-high        1496.5  $  1.50  997.7
+  #23 gemini-3.6-flash-high        1482.3  $  1.50  988.2
+  #9  muse-spark-1.3-max           1494.2  $  2.00  747.1
+  #12 muse-spark-1.1               1490.7  $  2.00  745.4
+  #27 glm-5.3-max                  1478.4  $  2.15  687.6
+  #33 glm-5.2-max                  1475.2  $  2.15  686.1
+  #22 qwen3.8-max                  1483.3  $  3.00  494.4
+
+3. THE VERDICT
+Best value on the board: glm-5.3-flash (Z.ai) — 6208.8 Elo points per blended dollar
+at $0.24/M. The status pick: claude-fable-5-high at $20.00/M —
+84x the cost for +29 Elo. Unless you're chasing a frontier eval,
+the premium buys a logo, not output.
+
+4. WHAT MOVED
+GPT-6.1-Sol ($2/$10) undercuts GPT-5.5 ($5/$30) from inside the same quality band. Gemini 3.8-Flash's
+promo ($0.75/$3.75) expires Dec 31 — it's the cheapest frontier-class rate on the board; annual
+commitments before it lapses. Full price table: aistack.intelligence/leaderboard
+
+5. ONE TACTIC
+Take your most-run production prompt. Send it once this week to the board's best-value model.
+Quality holds? The delta is margin you've been donating to a vendor for status.
+
+—
+Sources: LMArena open dataset (CC-BY-4.0) + official pricing pages, captured Oct 11, 2026.
+Every figure dated and linked. Methodology: aistack.intelligence/methodology
+Unsubscribe anytime. No vendor sponsored this.
