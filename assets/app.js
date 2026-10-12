@@ -48,6 +48,11 @@
       });
       var k = state.key, d = state.dir;
       out.sort(function (a, b) {
+        if (k === "price") {
+          var pa = a.price ? a.price.in + a.price.out : Infinity;  // unpriced sinks to bottom
+          var pb = b.price ? b.price.in + b.price.out : Infinity;
+          return d * (pa - pb);
+        }
         var av = k === "votes" ? ((a.extra && a.extra.votes) || 0) : a[k];
         var bv = k === "votes" ? ((b.extra && b.extra.votes) || 0) : b[k];
         if (typeof av === "string") return d * av.localeCompare(bv);
@@ -69,11 +74,15 @@
         var votes = (m.extra && m.extra.votes) || 0;
         var lic = (m.extra && m.extra.license) || "—";
         var pct = Math.max(4, Math.round(((m.elo - minElo) / (maxElo - minElo)) * 100));
+        var price = m.price
+          ? '<span class="price-cell">' + fmtMoney(m.price.in) + " / " + fmtMoney(m.price.out) + "</span>"
+          : '<span class="text-low">n/a</span>';
         return "<tr>" +
           '<td class="rank-cell">' + m.rank + "</td>" +
           '<td><span class="model-name">' + esc(m.model) + "</span></td>" +
           "<td>" + '<span class="org-tag">' + esc(m.org) + "</span></td>" +
           '<td><div class="bar-cell"><div class="bar" style="width:' + pct + '%"></div><span class="elo-chip">' + fmtInt(m.elo) + "</span></div></td>" +
+          "<td>" + price + "</td>" +
           '<td class="num text-mid">' + fmtInt(votes) + "</td>" +
           '<td><span class="' + (isOpen(lic) ? "license-open" : "license-prop") + '">' + esc(lic) + "</span></td>" +
           "</tr>";

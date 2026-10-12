@@ -6,29 +6,29 @@
 
 :root {
   /* surfaces */
-  --bg: #0a0a0f;
-  --bg-raised: #101018;
-  --bg-overlay: #16161f;
+  --bg: #0b0b0a;
+  --bg-raised: #121210;
+  --bg-overlay: #191916;
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
 
   /* type */
-  --text-hi: #f4f4f6;
-  --text: #b6b9c5;
-  --text-mid: #8b8fa0;
-  --text-low: #5d6172;
+  --text-hi: #f2f0ea;
+  --text: #b8b5ad;
+  --text-mid: #8f8c83;
+  --text-low: #66635c;
 
   /* accent — electric indigo, used sparingly */
-  --accent: #7c8cf8;
-  --accent-hi: #a5b0ff;
-  --accent-dim: rgba(124, 140, 248, 0.14);
-  --accent-line: rgba(124, 140, 248, 0.35);
+  --accent: #f5b944;
+  --accent-hi: #ffd479;
+  --accent-dim: rgba(245, 185, 68, 0.10);
+  --accent-line: rgba(245, 185, 68, 0.32);
   --green: #4ade80;
   --amber: #fbbf24;
   --red: #f87171;
 
   /* chart series */
-  --c1: #7c8cf8; --c2: #5eead4; --c3: #f0abfc; --c4: #fbbf24; --c5: #4ade80;
+  --c1: #f5b944; --c2: #5eead4; --c3: #f0abfc; --c4: #fbbf24; --c5: #4ade80;
   --c6: #f87171; --c7: #67e8f9; --c8: #fb923c;
 
   --radius: 10px;
@@ -46,13 +46,13 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 15.5px;
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* subtle top glow like Linear */
   background-image:
-    radial-gradient(1100px 420px at 50% -160px, rgba(124, 140, 248, 0.12), transparent 65%);
+    radial-gradient(1100px 420px at 50% -160px, rgba(245, 185, 68, 0.05), transparent 60%);
   background-repeat: no-repeat;
 }
 
@@ -108,7 +108,7 @@ code {
 .brand:hover { text-decoration: none; }
 .brand-mark {
   width: 22px; height: 22px; border-radius: 6px; flex: none;
-  background: linear-gradient(135deg, var(--accent) 0%, #4f46e5 55%, #312e81 100%);
+  background: var(--accent);
   box-shadow: 0 0 14px rgba(124, 140, 248, 0.45);
 }
 .nav-links { display: flex; align-items: center; gap: 4px; }
@@ -143,15 +143,15 @@ code {
 .hero .grid-bg {
   position: absolute; inset: 0; pointer-events: none; z-index: -1;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, black 30%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, black 30%, transparent 75%);
 }
 .hero h1 { max-width: 780px; }
 .hero h1 .grad {
-  background: linear-gradient(100deg, var(--accent-hi) 0%, #c7d2fe 45%, #8de9ff 100%);
+  background: linear-gradient(100deg, var(--accent-hi) 0%, var(--accent) 70%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .hero-sub { font-size: 1.16rem; color: var(--text-mid); max-width: 620px; margin: 22px 0 34px; }
@@ -213,7 +213,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .bar-cell .bar {
   position: absolute; left: 0; top: 50%; transform: translateY(-50%);
   height: 18px; border-radius: 4px;
-  background: linear-gradient(90deg, rgba(124, 140, 248, 0.5), rgba(124, 140, 248, 0.16));
+  background: linear-gradient(90deg, rgba(245, 185, 68, 0.55), rgba(245, 185, 68, 0.12));
   z-index: 0;
 }
 .bar-cell span { position: relative; z-index: 1; font-variant-numeric: tabular-nums; }
