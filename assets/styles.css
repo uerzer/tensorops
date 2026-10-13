@@ -416,3 +416,32 @@ footer { border-top: 1px solid var(--border); margin-top: 40px; padding: 44px 0 
   .foot-grid { grid-template-columns: 1fr; gap: 24px; }
   .beephiv-placeholder { flex-direction: column; }
 }
+
+/* ---------- mobile: real pass, not an afterthought ---------- */
+@media (max-width: 720px) {
+  html { font-size: 15px; }
+  .hero h1 { font-size: 2rem; letter-spacing: -0.03em; }
+  .hero { padding: 52px 0 40px; }
+  .hero-sub { font-size: 1.02rem; margin: 16px 0 24px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat b { font-size: 1.15rem; }
+  .stat { padding: 14px 14px; }
+  .section { padding: 44px 0; }
+  .table-wrap { margin: 0 -18px; border-left: 0; border-right: 0; border-radius: 0; }
+  table { font-size: 0.84rem; }
+  th, td { padding: 8px 10px; white-space: nowrap; }
+  td .model-name { max-width: 150px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+  .bar-cell { min-width: 90px; }
+  .cta-row .btn { width: 100%; text-align: center; }
+  .hero-actions .btn { width: 100%; text-align: center; }
+  .share-bar { flex-wrap: wrap; }
+  .share-bar .kbd { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .check-grid { max-height: 220px; }
+  .calc-grid { gap: 16px; }
+  .pick-card { padding: 16px; }
+  .faq-q { padding: 12px 14px; font-size: 0.92rem; }
+}
+@media (max-width: 400px) {
+  .stats { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.72rem; }
+}
